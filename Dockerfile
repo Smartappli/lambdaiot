@@ -47,7 +47,7 @@ WORKDIR /tmp/druid
 # package and install Druid locally
 # use versions-maven-plugin 2.1 to work around https://jira.codehaus.org/browse/MVERSIONS-285
 RUN mvn -U -B org.codehaus.mojo:versions-maven-plugin:2.1:set -DgenerateBackupPoms=false -DnewVersion=$DRUID_VERSION \
-  && mvn -U -B install -DskipTests=false -Dmaven.javadoc.skip=false \
+  && mvn -U -B install -DskipTests=true -Dmaven.javadoc.skip=true \
   && cp services/target/druid-services-$DRUID_VERSION-selfcontained.jar /usr/local/druid/lib \
   && cp -r distribution/target/extensions /usr/local/druid/ \
   && cp -r distribution/target/hadoop-dependencies /usr/local/druid/ \

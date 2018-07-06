@@ -68,18 +68,30 @@ WORKDIR /
 
 # Setup metadata store and add sample data
 ADD sample-data.sql sample-data.sql
-#RUN /etc/init.d/mysql start \
-RUN service mysql start \
-      && mysql -u root -e "GRANT ALL ON druid.* TO 'druid'@'localhost' IDENTIFIED BY 'diurd'; CREATE database druid CHARACTER SET utf8;" \
-      && java -cp /usr/local/druid/lib/druid-services-*-selfcontained.jar \
-          -Ddruid.extensions.directory=/usr/local/druid/extensions \
-          -Ddruid.extensions.loadList=[\"mysql-metadata-storage\"] \
-          -Ddruid.metadata.storage.type=mysql \
-          io.druid.cli.Main tools metadata-init \
-              --connectURI="jdbc:mysql://localhost:3306/druid" \
-              --user=druid --password=diurd \
-      && mysql -u root druid < sample-data.sql \
-      && /etc/init.d/mysql stop
+RUN systemctl start postgresql \
+       && createuser druid -P \
+       && createdb druid -O druid \
+       && java -cp /usr/local/druid/lib/druid-services-*-selfcontained.jar \
+           -Ddruid.extensions.directory=/usr/local/druid/extensions \
+           -Ddruid.extensions.loadLIst=[\"postgresql-metadata-storage\"] \
+           -Ddruid.metadata.storage.type=postgresql \
+           io.druid.cli.Main tools metadata-init \
+               --connectURI="jdbc:postgresql://localhost/druid" \
+               --user=druid --password=diurd \
+# faire le dump sql ici
+      && systemctl stop postgresql
+
+#RUN service mysql start \
+#      && mysql -u root -e "GRANT ALL ON druid.* TO 'druid'@'localhost' IDENTIFIED BY 'diurd'; CREATE database druid CHARACTER SET utf8;" \
+#      && java -cp /usr/local/druid/lib/druid-services-*-selfcontained.jar \
+#          -Ddruid.extensions.directory=/usr/local/druid/extensions \
+#          -Ddruid.extensions.loadList=[\"mysql-metadata-storage\"] \
+#          -Ddruid.metadata.storage.type=mysql \
+#          io.druid.cli.Main tools metadata-init \
+#              --connectURI="jdbc:mysql://localhost:3306/druid" \
+#              --user=druid --password=diurd \
+#      && mysql -u root druid < sample-data.sql \
+#      && /etc/init.d/mysql stop
 
 # Setup supervisord
 ADD supervisord.conf /etc/supervisor/conf.d/supervisord.conf
@@ -89,14 +101,12 @@ ADD supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 # - 8082: HTTP (broker)
 # - 8083: HTTP (historical)
 # - 8090: HTTP (overlord)
-# - 3306: MySQL
 # - 5432: PostgreSQL
 # - 2181 2888 3888: ZooKeeper
 EXPOSE 8081
 EXPOSE 8082
 EXPOSE 8083
 EXPOSE 8090
-EXPOSE 3306
 EXPOSE 5432
 EXPOSE 2181 2888 3888
 

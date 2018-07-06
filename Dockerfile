@@ -4,6 +4,10 @@ FROM ubuntu:18.04
 ENV GITHUB_OWNER druid-io
 ENV DRUID_VERSION 0.12.1
 ENV ZOOKEEPER_VERSION 3.4.10
+ENV DEBIAN_FRONTEND noninteractive
+
+RUN echo "tzdata tzdata/Areas select Europe" | debconf-set-selections \
+    && echo "tzdata tzdata/Zones/Europe select Brussels" | debconf-set-selections 
 
 # Java 8
 RUN apt-get update \
@@ -15,7 +19,7 @@ RUN apt-get update \
       && apt-get install -y oracle-java8-installer oracle-java8-set-default \
                             apt-utils \
                             postgresql-10 \
-                            mysql-server \
+			    mysql-server \
                             supervisor \
                             git \
       && apt-get clean \
@@ -64,7 +68,8 @@ WORKDIR /
 
 # Setup metadata store and add sample data
 ADD sample-data.sql sample-data.sql
-RUN systemctl start mysql \
+#RUN /etc/init.d/mysql start \
+RUN service mysql start \
       && mysql -u root -e "GRANT ALL ON druid.* TO 'druid'@'localhost' IDENTIFIED BY 'diurd'; CREATE database druid CHARACTER SET utf8;" \
       && java -cp /usr/local/druid/lib/druid-services-*-selfcontained.jar \
           -Ddruid.extensions.directory=/usr/local/druid/extensions \
@@ -74,7 +79,7 @@ RUN systemctl start mysql \
               --connectURI="jdbc:mysql://localhost:3306/druid" \
               --user=druid --password=diurd \
       && mysql -u root druid < sample-data.sql \
-      && systemctl stop mysql
+      && /etc/init.d/mysql stop
 
 # Setup supervisord
 ADD supervisord.conf /etc/supervisor/conf.d/supervisord.conf
@@ -85,12 +90,14 @@ ADD supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 # - 8083: HTTP (historical)
 # - 8090: HTTP (overlord)
 # - 3306: MySQL
+# - 5432: PostgreSQL
 # - 2181 2888 3888: ZooKeeper
 EXPOSE 8081
 EXPOSE 8082
 EXPOSE 8083
 EXPOSE 8090
 EXPOSE 3306
+EXPOSE 5432
 EXPOSE 2181 2888 3888
 
 WORKDIR /var/lib/druid

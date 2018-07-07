@@ -3,7 +3,7 @@ FROM ubuntu:18.04
 # Set version and github repo which you want to build from
 ENV GITHUB_OWNER druid-io
 ENV DRUID_VERSION 0.12.2
-ENV ZOOKEEPER_VERSION 3.4.10
+ENV ZOOKEEPER_VERSION 3.4.12
 ENV DEBIAN_FRONTEND noninteractive
 
 RUN echo "tzdata tzdata/Areas select Europe" | debconf-set-selections \
@@ -74,7 +74,8 @@ WORKDIR /
 #       && sudo -u postgres createdb druid -O druid \
 #       && sudo -u postgres bash -c "psql -c \"GRANT ALL PRIVILEGES ON DATABASE druid TO druid;\"" \
 ADD sample-data.sql sample-data.sql
-RUN service mysql start \
+RUN chown -R mysql:mysql /var/lib/mysql /var/run/mysqld \
+       && /etc/init.d/mysql start \
        && mysql -u root -e "GRANT ALL ON druid.* TO 'druid'@'localhost' IDENTIFIED BY 'diurd'; CREATE database druid CHARACTER SET utf8;" \
        && java -cp /usr/local/druid/lib/druid-services-*-selfcontained.jar \
            -Ddruid.extensions.directory=/usr/local/druid/extensions \
@@ -89,7 +90,7 @@ RUN service mysql start \
               --connectURI="jdbc:mysql://localhost:3306/druid" \
               --user=druid --password=diurd \
            && mysql -u root druid < sample-data.sql \	   
-           && service mysql stop
+           && /etc/init.d/ mysql stop
            #-Ddruid.metadata.storage.type=postgresql \
 	   #io.druid.cli.Main tools \
 #      && service postgresql stop

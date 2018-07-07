@@ -67,9 +67,9 @@ WORKDIR /
 
 # Setup metadata store and add sample data
 ADD sample-data.sql sample-data.sql
-RUN systemctl start postgresql \
-       && createuser druid -P \
-       && createdb druid -O druid \
+RUN service postgresql start \
+       && sudo -u postgres bash -c "psql -c \"CREATE USER druid WITH PASSWORD 'diurd';\"" \
+       && sudo -u postgres createdb druid -O druid \
        && java -cp /usr/local/druid/lib/druid-services-*-selfcontained.jar \
            -Ddruid.extensions.directory=/usr/local/druid/extensions \
            -Ddruid.extensions.loadLIst=[\"postgresql-metadata-storage\"] \
@@ -78,7 +78,7 @@ RUN systemctl start postgresql \
                --connectURI="jdbc:postgresql://localhost/druid" \
                --user=druid --password=diurd \
 # faire le dump sql ici
-      && systemctl stop postgresql
+      && service postgresql stop
 
 #      && mysql -u root druid < sample-data.sql \
 

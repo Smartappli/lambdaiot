@@ -89,10 +89,9 @@ RUN service mysql start \
               --connectURI="jdbc:mysql://localhost:3306/druid" \
               --user=druid --password=diurd \
            && mysql -u root druid < sample-data.sql \	   
-
+           && service mysql stop
            #-Ddruid.metadata.storage.type=postgresql \
 	   #io.druid.cli.Main tools \
-       && service mysql stop
 #      && service postgresql stop
 
 # Setup supervisord

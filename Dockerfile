@@ -19,6 +19,7 @@ RUN apt-get update \
       && apt-get install -y oracle-java8-installer oracle-java8-set-default \
                             apt-utils \
                             postgresql \
+			    sudo \
                             supervisor \
                             git \
       && apt-get clean \
@@ -66,22 +67,18 @@ RUN mvn -U -B org.codehaus.mojo:versions-maven-plugin:2.1:set -DgenerateBackupPo
 WORKDIR /
 
 # Setup metadata store and add sample data
-ADD sample-data.sql sample-data.sql
 RUN service postgresql start \
        && sudo -u postgres bash -c "psql -c \"CREATE USER druid WITH PASSWORD 'diurd';\"" \
        && sudo -u postgres createdb druid -O druid \
+       && sudo -u postgres bash -c "psql -c \"GRANT ALL PRIVILEGES ON DATABASE druid TO druid;\"" \
        && java -cp /usr/local/druid/lib/druid-services-*-selfcontained.jar \
            -Ddruid.extensions.directory=/usr/local/druid/extensions \
-	   -Ddruid.extensions.hadoopDependenciesDir=/usr/local/druid/hadoop-dependencies \
-           -Ddruid.extensions.loadLIst=[\"postgresql-metadata-storage\"] \
+           -Ddruid.extensions.loadLIst=[\"druid-histogram\",\"druid-datasketches\",\"druid-hdfs-storage\",\"postgresql-metadata-storage\",\"druid-redis-cache\",\"druid-kafka-indexing-service\",\"druid-stats\"] \
+	   -Ddruid.storage.type=hdfs \
+	   -Ddruid.storage.storageDirectory=/usr/local/druid/segments \
            -Ddruid.metadata.storage.type=postgresql \
-           io.druid.cli.Main tools metadata-init \
-               --connectURI="jdbc:postgresql://localhost:5432/druid" \
-               --user=druid --password=diurd \
-# faire le dump sql ici
+           io.druid.cli.Main tools \
       && service postgresql stop
-
-#      && mysql -u root druid < sample-data.sql \
 
 # Setup supervisord
 ADD supervisord.conf /etc/supervisor/conf.d/supervisord.conf

@@ -19,6 +19,7 @@ RUN apt-get update \
       && apt-get install -y oracle-java8-installer oracle-java8-set-default \
                             apt-utils \
                             postgresql \
+			    redis-server \
 			    sudo \
                             supervisor \
                             git \

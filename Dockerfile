@@ -18,7 +18,7 @@ RUN apt-get update \
       && echo oracle-java-8-installer shared/accepted-oracle-license-v1-1 select true | /usr/bin/debconf-set-selections \
       && apt-get install -y oracle-java8-installer oracle-java8-set-default \
                             apt-utils \
-                            postgresql-10 \
+                            postgresql \
                             supervisor \
                             git \
       && apt-get clean \
@@ -72,6 +72,7 @@ RUN service postgresql start \
        && sudo -u postgres createdb druid -O druid \
        && java -cp /usr/local/druid/lib/druid-services-*-selfcontained.jar \
            -Ddruid.extensions.directory=/usr/local/druid/extensions \
+           -Ddruid.extensions.hadoopDependenciesDir=/usr/local/druid/hadoop-dependencies \
            -Ddruid.extensions.loadLIst=[\"postgresql-metadata-storage\"] \
            -Ddruid.metadata.storage.type=postgresql \
            io.druid.cli.Main tools metadata-init \

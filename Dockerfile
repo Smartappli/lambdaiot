@@ -78,7 +78,7 @@ RUN service mysql start \
        && mysql -u root -e "GRANT ALL ON druid.* TO 'druid'@'localhost' IDENTIFIED BY 'diurd'; CREATE database druid CHARACTER SET utf8;" \
        && java -cp /usr/local/druid/lib/druid-services-*-selfcontained.jar \
            -Ddruid.extensions.directory=/usr/local/druid/extensions \
-           -Ddruid.extensions.loadLIst=[\"druid-histogram\",\"druid-datasketches\",\"druid-hdfs-storage\",\"postgresql-metadata-storage\",\"druid-redis-cache\",\"druid-kafka-indexing-service\",\"druid-stats\"] \
+           -Ddruid.extensions.loadLIst=[\"druid-histogram\",\"druid-datasketches\",\"druid-hdfs-storage\",\"mysql-metadata-storage\",\"druid-redis-cache\",\"druid-kafka-indexing-service\",\"druid-stats\"] \
 	   -Ddruid.storage.type=hdfs \
 	   -Ddruid.cache.type=redis \
 	   -Ddruid.cache.host=localhost \

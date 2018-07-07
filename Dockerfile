@@ -86,9 +86,10 @@ RUN find /var/lib/mysql -type f -exec touch {} \; \
 	   -Ddruid.cache.port=6379 \	   
 	   -Ddruid.storage.storageDirectory=/usr/local/druid/segments \	   
            -Ddruid.metadata.storage.type=mysql \
-           io.druid.cli.Main tools metadata-init \
-              --connectURI="jdbc:mysql://localhost:3306/druid" \
-              --user=druid --password=diurd \
+           io.druid.cli.Main tools \
+	   #metadata-init \
+           #   --connectURI="jdbc:mysql://localhost:3306/druid" \
+           #   --user=druid --password=diurd \
            && mysql -u root druid < sample-data.sql \	   
            && /etc/init.d/ mysql stop
            #-Ddruid.metadata.storage.type=postgresql \

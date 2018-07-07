@@ -2,7 +2,7 @@ FROM ubuntu:18.04
 
 # Set version and github repo which you want to build from
 ENV GITHUB_OWNER apache
-ENV DRUID_VERSION master
+ENV DRUID_VERSION 0.12.2
 ENV ZOOKEEPER_VERSION 3.4.10
 ENV DEBIAN_FRONTEND noninteractive
 

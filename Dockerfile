@@ -90,7 +90,7 @@ RUN find /var/lib/mysql -type f -exec touch {} \; \
 	   #metadata-init \
            #   --connectURI="jdbc:mysql://localhost:3306/druid" \
            #   --user=druid --password=diurd \
-           && mysql -u root druid < sample-data.sql \	   
+           # && mysql -u root druid < sample-data.sql \	   
            && /etc/init.d/ mysql stop
            #-Ddruid.metadata.storage.type=postgresql \
 	   #io.druid.cli.Main tools \

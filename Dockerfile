@@ -18,8 +18,7 @@ RUN apt-get update \
       && echo oracle-java-8-installer shared/accepted-oracle-license-v1-1 select true | /usr/bin/debconf-set-selections \
       && apt-get install -y oracle-java8-installer oracle-java8-set-default \
                             apt-utils \
-                        #    postgresql \
-			    mysql-server \
+                            postgresql \
 			    redis-server \
 			    sudo \
                             supervisor \
@@ -69,32 +68,28 @@ RUN mvn -U -B org.codehaus.mojo:versions-maven-plugin:2.1:set -DgenerateBackupPo
 WORKDIR /
 
 # Setup metadata store and add sample data
-#RUN service postgresql start \
-#       && sudo -u postgres bash -c "psql -c \"CREATE USER druid WITH PASSWORD 'diurd';\"" \
-#       && sudo -u postgres createdb druid -O druid \
-#       && sudo -u postgres bash -c "psql -c \"GRANT ALL PRIVILEGES ON DATABASE druid TO druid;\"" \
-ADD sample-data.sql sample-data.sql
-RUN find /var/lib/mysql -type f -exec touch {} \; \
-       && /etc/init.d/mysql start \
-       && mysql -u root -e "GRANT ALL ON druid.* TO 'druid'@'localhost' IDENTIFIED BY 'diurd'; CREATE database druid CHARACTER SET utf8;" \
+#ADD sample-data.sql sample-data.sql
+RUN service postgresql start \
+       && sudo -u postgres bash -c "psql -c \"CREATE USER druid WITH PASSWORD 'diurd';\"" \
+       && sudo -u postgres createdb druid -O druid \
+       && sudo -u postgres bash -c "psql -c \"GRANT ALL PRIVILEGES ON DATABASE druid TO druid;\"" \
        && java -cp /usr/local/druid/lib/druid-services-*-selfcontained.jar \
            -Ddruid.extensions.directory=/usr/local/druid/extensions \
-           -Ddruid.extensions.loadLIst=[\"druid-histogram\",\"druid-datasketches\",\"druid-hdfs-storage\",\"mysql-metadata-storage\",\"druid-redis-cache\",\"druid-kafka-indexing-service\",\"druid-stats\"] \
+           -Ddruid.extensions.loadLIst=[\"druid-histogram\",\"druid-datasketches\",\"druid-hdfs-storage\",\"postgresql-metadata-storage\",\"druid-redis-cache\",\"druid-kafka-indexing-service\",\"druid-stats\"] \
 	   -Ddruid.storage.type=hdfs \
 	   -Ddruid.cache.type=redis \
 	   -Ddruid.cache.host=localhost \
-	   -Ddruid.cache.port=6379 \	   
-	   -Ddruid.storage.storageDirectory=/usr/local/druid/segments \	   
-           -Ddruid.metadata.storage.type=mysql \
+	   -Ddruid.cache.port=6379 \
+	   -Ddruid.indexer.logs.type=hdfs \
+	   -Ddruid.indexer.logs.directory=/usr/local/druid/indexing-logs \
+	   -Ddruid.storage.storageDirectory=/usr/local/druid/segments \
+           -Ddruid.metadata.storage.type=postgresql \
            io.druid.cli.Main tools \
-	   #metadata-init \
-           #   --connectURI="jdbc:mysql://localhost:3306/druid" \
-           #   --user=druid --password=diurd \
-           # && mysql -u root druid < sample-data.sql \	   
-           && /etc/init.d/ mysql stop
-           #-Ddruid.metadata.storage.type=postgresql \
-	   #io.druid.cli.Main tools \
-#      && service postgresql stop
+# metadata-init \
+#               --connectURI="jdbc:postgresql://localhost:5432/druid" \
+#               --user=druid --password=diurd \
+# && mysql -u root druid < sample-data.sql \
+      && service postgresql stop
 
 # Setup supervisord
 ADD supervisord.conf /etc/supervisor/conf.d/supervisord.conf
@@ -116,4 +111,4 @@ EXPOSE 5432
 EXPOSE 2181 2888 3888
 
 WORKDIR /var/lib/druid
-ENTRYPOINT export HOSTIP="$(resolveip -s $HOSTNAME)" && find /var/lib/mysql -type f -exec touch {} \; && exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
+ENTRYPOINT export HOSTIP="$(resolveip -s $HOSTNAME)" && exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf

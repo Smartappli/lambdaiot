@@ -49,7 +49,7 @@ RUN mkdir -p /usr/local/druid/lib
 # trigger rebuild only if branch changed
 https://github.com/apache/incubator-druid.git
 ADD https://api.github.com/repos/$GITHUB_OWNER/incubator-druid/git/refs/heads/$DRUID_VERSION druid-version.json
-RUN git clone -q --branch $DRUID_VERSION --depth 1 https://github.com/$GITHUB_OWNER/druid.git /tmp/druid
+RUN git clone -q --branch $DRUID_VERSION --depth 1 https://github.com/$GITHUB_OWNER/incubator-druid.git /tmp/druid
 WORKDIR /tmp/druid
 
 # package and install Druid locally

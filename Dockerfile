@@ -102,6 +102,7 @@ ADD supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 # - 6379: Redis
 # - 5432: PostgreSQL
 # - 2181 2888 3888: ZooKeeper
+# - 9001: Supervisord UI
 EXPOSE 8081
 EXPOSE 8082
 EXPOSE 8083
@@ -109,6 +110,7 @@ EXPOSE 8090
 EXPOSE 6379
 EXPOSE 5432
 EXPOSE 2181 2888 3888
+EXPOSE 9001
 
 WORKDIR /var/lib/druid
 ENTRYPOINT export HOSTIP="$(resolveip -s $HOSTNAME)" && exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf

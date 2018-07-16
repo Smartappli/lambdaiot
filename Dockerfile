@@ -36,7 +36,7 @@ RUN echo 'tzdata tzdata/Areas select Europe' | debconf-set-selections \
   	&& echo ${TZ} > /etc/timezone \
   	&& dpkg-reconfigure -f noninteractive tzdata \
   	&& echo "Contents of /etc/timezone and /etc/default/locale :" \
-	&& cat /etc/timezone && cat /etc/default/locale \
+	&& cat /etc/timezone && cat /etc/default/locale 
 
 # Maven
 RUN wget -q -O - http://archive.apache.org/dist/maven/maven-3/3.2.5/binaries/apache-maven-3.2.5-bin.tar.gz | tar -xzf - -C /usr/local \

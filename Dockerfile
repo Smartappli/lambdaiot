@@ -4,7 +4,9 @@ FROM ubuntu:18.04
 ENV GITHUB_OWNER apache
 ENV DRUID_VERSION 0.12.2
 ENV ZOOKEEPER_VERSION 3.4.10
-ENV DEBIAN_FRONTEND noninteractive
+ARG DEBIAN_FRONTEND=noninteractive
+ENV LANG=fr_BE.UTF-8 \
+TZ=Europe/Brussels
 
 RUN echo 'tzdata tzdata/Areas select Europe' | debconf-set-selections \ 
 	&& echo 'tzdata tzdata/Zones/Europe select Brussels' | debconf-set-selections \ 

@@ -6,8 +6,9 @@ ENV DRUID_VERSION 0.12.2
 ENV ZOOKEEPER_VERSION 3.4.10
 ENV DEBIAN_FRONTEND noninteractive
 
-RUN echo "tzdata tzdata/Areas select Europe" | debconf-set-selections \
-    && echo "tzdata tzdata/Zones/Europe select Brussels" | debconf-set-selections 
+RUN echo 'tzdata tzdata/Areas select Europe' | debconf-set-selections \ 
+	&& echo 'tzdata tzdata/Zones/Europe select Brussels' | debconf-set-selections \ 
+	&& echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections \
 
 # Java 8
 RUN apt-get update \

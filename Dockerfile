@@ -8,18 +8,6 @@ ARG DEBIAN_FRONTEND=noninteractive
 ENV LANG=fr_BE.UTF-8 \
 TZ=Europe/Brussels
 
-RUN echo 'tzdata tzdata/Areas select Europe' | debconf-set-selections \ 
-	&& echo 'tzdata tzdata/Zones/Europe select Brussels' | debconf-set-selections \ 
-	&& echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections \
-  	&& apt-get -y install wget tzdata locales \
-  	&& locale-gen $LANG \
-  	&& export LANG=fr_BE.UTF-8 \
-  	&& dpkg-reconfigure -f noninteractive locales \
-  	&& echo ${TZ} > /etc/timezone \
-  	&& dpkg-reconfigure -f noninteractive tzdata \
-  	&& echo "Contents of /etc/timezone and /etc/default/locale :" \
-	&& cat /etc/timezone && cat /etc/default/locale \
-
 # Java 8
 RUN apt-get update \
       && apt-get install -y software-properties-common \
@@ -37,6 +25,18 @@ RUN apt-get update \
       && apt-get clean \
       && rm -rf /var/cache/oracle-jdk8-installer \
       && rm -rf /var/lib/apt/lists/*
+
+RUN echo 'tzdata tzdata/Areas select Europe' | debconf-set-selections \ 
+	&& echo 'tzdata tzdata/Zones/Europe select Brussels' | debconf-set-selections \ 
+	&& echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections \
+  	&& apt-get -y install wget tzdata locales \
+  	&& locale-gen $LANG \
+  	&& export LANG=fr_BE.UTF-8 \
+  	&& dpkg-reconfigure -f noninteractive locales \
+  	&& echo ${TZ} > /etc/timezone \
+  	&& dpkg-reconfigure -f noninteractive tzdata \
+  	&& echo "Contents of /etc/timezone and /etc/default/locale :" \
+	&& cat /etc/timezone && cat /etc/default/locale \
 
 # Maven
 RUN wget -q -O - http://archive.apache.org/dist/maven/maven-3/3.2.5/binaries/apache-maven-3.2.5-bin.tar.gz | tar -xzf - -C /usr/local \

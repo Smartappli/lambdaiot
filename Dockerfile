@@ -11,6 +11,14 @@ TZ=Europe/Brussels
 RUN echo 'tzdata tzdata/Areas select Europe' | debconf-set-selections \ 
 	&& echo 'tzdata tzdata/Zones/Europe select Brussels' | debconf-set-selections \ 
 	&& echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections \
+  	&& apt-get -y install wget tzdata locales \
+  	&& locale-gen $LANG \
+  	&& export LANG=fr_BE.UTF-8 \
+  	&& dpkg-reconfigure -f noninteractive locales \
+  	&& echo ${TZ} > /etc/timezone \
+  	&& dpkg-reconfigure -f noninteractive tzdata \
+  	&& echo "Contents of /etc/timezone and /etc/default/locale :" \
+	&& cat /etc/timezone && cat /etc/default/locale \
 
 # Java 8
 RUN apt-get update \

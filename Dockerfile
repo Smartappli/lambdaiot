@@ -126,9 +126,10 @@ RUN wget -q -O - http://apache.cu.be/kafka/1.1.0/kafka_2.11-1.1.0.tgz | tar -xvz
   #&& bin/kafka-server-start.sh config/server.properties \
   
 # Setup Samza
-RUN cd /usr/local \
+RUN pwd \
+  && cd /usr/local \
   && git clone http://git-wip-us.apache.org/repos/asf/samza.git \
-  && cwd \
+  && pwd \
   && cd /usr/local/samza \
   && ./gradlew clean build
   

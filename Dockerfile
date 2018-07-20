@@ -127,7 +127,7 @@ RUN wget -q -O - http://apache.cu.be/kafka/1.1.0/kafka_2.11-1.1.0.tgz | tar -xvz
   
 # Setup Samza
 RUN git clone http://git-wip-us.apache.org/repos/asf/samza.git \
-  && cd samza
+  && cd samza \
   && ./gradlew clean build
   
 # Setup supervisord

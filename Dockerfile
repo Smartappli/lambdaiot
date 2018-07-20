@@ -22,6 +22,7 @@ RUN apt-get update \
 			    sudo \
                             supervisor \
                             git \
+			    build-essential \
       && apt-get clean \
       && rm -rf /var/cache/oracle-jdk8-installer \
       && rm -rf /var/lib/apt/lists/*

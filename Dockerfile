@@ -126,12 +126,10 @@ RUN wget -q -O - http://apache.cu.be/kafka/1.1.0/kafka_2.11-1.1.0.tgz | tar -xvz
   #&& bin/kafka-server-start.sh config/server.properties \
   
 # Setup Samza
-RUN pwd \
-  && cd /usr/local \
-  && git clone http://git-wip-us.apache.org/repos/asf/samza.git \
-  && pwd \
-  && cd /usr/local/samza \
-  && ./gradlew clean build
+RUN git clone -q http://git-wip-us.apache.org/repos/asf/samza.git /tmp/samza
+WORKDIR /tmp/samza
+
+RUN ./gradlew clean build
   
 # Setup supervisord
 ADD supervisord.conf /etc/supervisor/conf.d/supervisord.conf

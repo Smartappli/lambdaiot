@@ -23,10 +23,18 @@ RUN apt-get update \
                             supervisor \
                             git \
 			    build-essential \
+			    unzip \
       && apt-get clean \
       && rm -rf /var/cache/oracle-jdk8-installer \
       && rm -rf /var/lib/apt/lists/*
 
+# Setup gradle
+RUN wget https://services.gradle.org/distributions/gradle-3.4.1-bin.zip \
+      && mkdir /opt/gradle \
+      && unzip -d /opt/gradle gradle-3.4.1-bin.zip \
+      && export PATH=$PATH:/opt/gradle/gradle-3.4.1/bin
+      
+# Setup time zone
 RUN echo 'tzdata tzdata/Areas select Europe' | debconf-set-selections \ 
 	&& echo 'tzdata tzdata/Zones/Europe select Brussels' | debconf-set-selections \ 
 	&& echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections \
@@ -116,6 +124,12 @@ RUN wget -q -O - http://apache.cu.be/kafka/1.1.0/kafka_2.11-1.1.0.tgz | tar -xvz
   #&& cp config/server.properties config/server-1.properties \
   #&& cp config/server.properties config/server-2.properties \
   #&& bin/kafka-server-start.sh config/server.properties \
+  
+# Setup Samza
+RUN git clone http://git-wip-us.apache.org/repos/asf/samza.git \
+  && cd samza
+  && ./gradlew clean build
+  
 # Setup supervisord
 ADD supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 

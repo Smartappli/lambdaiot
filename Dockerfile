@@ -3,7 +3,7 @@ FROM ubuntu:18.04
 # Set version and github repo which you want to build from
 ENV GITHUB_OWNER apache
 ENV DRUID_VERSION 0.12.2
-ENV ZOOKEEPER_VERSION 3.4.10
+ENV ZOOKEEPER_VERSION 3.4.13
 ARG DEBIAN_FRONTEND=noninteractive
 ENV LANG=fr_BE.UTF-8 \
 TZ=Europe/Brussels
